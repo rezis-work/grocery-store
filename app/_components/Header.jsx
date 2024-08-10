@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid, Search, ShoppingBag } from "lucide-react";
 import Image from "next/image";
@@ -9,8 +10,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import GlobalApi from "../_utils/GlobalApi";
+import { useEffect } from "react";
 
 const Header = () => {
+  useEffect(() => {
+    getCategoryList();
+  }, []);
+
+  const getCategoryList = () => {
+    GlobalApi.getCategory().then((res) => {
+      console.log("Category List response", res);
+    });
+  };
   return (
     <div className=" p-5 shadow-md flex justify-between">
       <div className=" flex items-center gap-8">
