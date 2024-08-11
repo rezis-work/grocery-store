@@ -11,16 +11,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import GlobalApi from "../_utils/GlobalApi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Header = () => {
+  const [categoryList, setCategoryList] = useState([]);
   useEffect(() => {
     getCategoryList();
   }, []);
 
   const getCategoryList = () => {
     GlobalApi.getCategory().then((res) => {
-      console.log("Category List response", res);
+      setCategoryList(res.data.data);
+      console.log(res);
     });
   };
   return (
@@ -43,10 +45,23 @@ const Header = () => {
             <DropdownMenuContent>
               <DropdownMenuLabel>Browse category</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
+              {categoryList.map((category) => (
+                <DropdownMenuItem
+                  className=" cursor-pointer flex items-center gap-2"
+                  key={category.id}
+                >
+                  <Image
+                    src={
+                      process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                      category.attributes?.icon?.data[0]?.attributes?.url
+                    }
+                    alt="icon"
+                    width={23}
+                    height={23}
+                  />
+                  <h2>{category.attributes.name}</h2>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
