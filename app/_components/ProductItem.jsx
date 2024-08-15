@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import ProductItemDetail from "./ProductItemDetail";
 
 const ProductItem = ({ product }) => {
   return (
@@ -30,12 +38,24 @@ const ProductItem = ({ product }) => {
           ${product.attributes.mrp}
         </h2>
       </div>
-      <Button
-        variant="outline"
-        className=" text-primary hover:text-white  hover:bg-green-600"
-      >
-        Add to cart
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className=" text-primary hover:text-white  hover:bg-green-600"
+          >
+            Add to cart
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{product.attributes.name}</DialogTitle>
+            <DialogDescription>
+              <ProductItemDetail product={product} />
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
