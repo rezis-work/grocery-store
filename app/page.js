@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import Slider from "./_components/Slider";
 import GlobalApi from "./_utils/GlobalApi";
 import CategoryList from "./_components/CategoryList";
