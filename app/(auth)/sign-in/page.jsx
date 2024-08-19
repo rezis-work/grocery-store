@@ -2,6 +2,7 @@
 import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoaderIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   useEffect(() => {
     const jwt = sessionStorage.getItem("jwt");
@@ -18,15 +20,19 @@ const SignIn = () => {
   }, []);
   const handleSignIn = (e) => {
     e.preventDefault();
+    setIsLoading(true);
     GlobalApi.signIn(email, password).then(
       (res) => {
         sessionStorage.setItem("user", JSON.stringify(res.data.user));
         sessionStorage.setItem("jwt", res.data.jwt);
         toast("Login succesfully");
         router.push("/");
+        setIsLoading(false);
       },
       (e) => {
-        toast("Error while creating account!");
+        console.log(e);
+        toast(e.response?.data?.error?.message);
+        setIsLoading(false);
       }
     );
   };
@@ -64,7 +70,7 @@ const SignIn = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button disabled={!password || !email} type="submit">
-              Sign In
+              {isLoading ? <LoaderIcon className=" animate-spin" /> : "Sign In"}
             </Button>
           </form>
           <div className="flex items-center flex-col md:flex-row gap-2">

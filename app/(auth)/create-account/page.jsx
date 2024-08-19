@@ -2,6 +2,7 @@
 import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoaderIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ const CreateAccount = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsloading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,15 +23,18 @@ const CreateAccount = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsloading(true);
     GlobalApi.registerUser(username, email, password).then(
       (res) => {
         sessionStorage.setItem("user", JSON.stringify(res.data.user));
         sessionStorage.setItem("jwt", res.data.jwt);
         toast("Account created succesfully");
         router.push("/");
+        setIsloading(false);
       },
       (e) => {
-        toast("Error while creating account!");
+        toast(e.response?.data?.error?.message);
+        setIsloading(false);
       }
     );
   };
@@ -75,7 +80,11 @@ const CreateAccount = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button disabled={!username || !password || !email} type="submit">
-              Create an Account
+              {isLoading ? (
+                <LoaderIcon className="animate-spin" />
+              ) : (
+                "Create Account"
+              )}
             </Button>
           </form>
           <div className="flex items-center flex-col md:flex-row gap-2">
