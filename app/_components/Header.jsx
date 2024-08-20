@@ -1,9 +1,17 @@
 "use client";
-
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   CircleUserRound,
   LayoutGrid,
   Search,
+  ShoppingBag,
   ShoppingBasket,
 } from "lucide-react";
 import Image from "next/image";
@@ -20,6 +28,7 @@ import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { UpdateCartContext } from "../_context/UpdateCartContext";
+import CartItemList from "./CartItemList";
 
 const Header = ({ children }) => {
   const router = useRouter();
@@ -29,6 +38,7 @@ const Header = ({ children }) => {
   const jwt = sessionStorage.getItem("jwt");
   const [totalCartItem, setToatalCartItem] = useState(0);
   const { updateCart } = useContext(UpdateCartContext);
+  const [cartItemList, setCartItemList] = useState([]);
 
   useEffect(() => {
     getCartItems();
@@ -45,9 +55,10 @@ const Header = ({ children }) => {
   };
 
   const getCartItems = async () => {
-    const cartItemList = await GlobalApi.getCartItem(user.id, jwt);
-    console.log(cartItemList);
-    setToatalCartItem(cartItemList?.length);
+    const cartItemList_ = await GlobalApi.getCartItem(user.id, jwt);
+    console.log(cartItemList_);
+    setToatalCartItem(cartItemList_?.length);
+    setCartItemList(cartItemList_);
   };
 
   const onSignOut = () => {
@@ -111,12 +122,26 @@ const Header = ({ children }) => {
         </div>
       </div>
       <div className=" flex gap-5 items-center">
-        <h2 className=" flex gap-2 items-center text-lg">
-          <ShoppingBasket className=" h-7 w-7" />{" "}
-          <span className=" bg-green-600 text-white px-2 rounded-full">
-            {totalCartItem}
-          </span>
-        </h2>
+        <Sheet>
+          <SheetTrigger asChild>
+            <h2 className=" flex gap-2 items-center text-lg">
+              <ShoppingBasket className=" h-7 w-7 cursor-pointer" />
+              <span className=" bg-green-600 text-white px-2 rounded-full">
+                {totalCartItem}
+              </span>
+            </h2>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-3 bg-green-600 text-white text-lg font-bold  mt-7 p-3 rounded-lg justify-center">
+                {user.username}'s {"  "} Cart <ShoppingBag />{" "}
+              </SheetTitle>
+              <SheetDescription>
+                <CartItemList cartItemList={cartItemList} />
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
         {!isLogin ? (
           children
         ) : (
