@@ -1,16 +1,55 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ShoppingBasket } from "lucide-react";
+import { LoaderIcon, ShoppingBasket } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useContext, useState } from "react";
+import GlobalApi from "../_utils/GlobalApi";
+import { toast } from "sonner";
+import { UpdateCartContext } from "../_context/UpdateCartContext";
 
 const ProductItemDetail = ({ product }) => {
+  const router = useRouter();
+  const jwt = sessionStorage.getItem("jwt");
+  const { updateCart, setUpdateCart } = useContext(UpdateCartContext);
+  const user = JSON.parse(sessionStorage.getItem("user"));
   const [count, setCount] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(
     product.attributes.sellingPrice
       ? product.attributes.sellingPrice
       : product.attributes.mrp
   );
+
+  const addToCart = () => {
+    setLoading(true);
+    if (!jwt) {
+      router.push("sign-in");
+      setLoading(false);
+    }
+    const data = {
+      data: {
+        quantity: +count,
+        amount: (+count * +total).toFixed(2),
+        products: product.id,
+        users_permissions_user: user?.id,
+        userId: user.id,
+      },
+    };
+    console.log(data);
+    GlobalApi.addToCart(data, jwt).then(
+      (res) => {
+        console.log(res);
+        toast("Added to cart");
+        setUpdateCart((prev) => !prev);
+        setLoading(false);
+      },
+      (e) => {
+        toast("Error while adding product in cart!");
+      }
+    );
+  };
+
   const handleAdd = () => {
     setCount((prev) => prev + 1);
   };
@@ -71,9 +110,19 @@ const ProductItemDetail = ({ product }) => {
               </h2>
             </div>
           </div>
-          <Button className="flex items-center gap-3 mt-3">
-            <ShoppingBasket />
-            Add to cart
+          <Button
+            onClick={() => addToCart()}
+            className="flex items-center gap-3 mt-3"
+            disbled={loading}
+          >
+            {loading ? (
+              <LoaderIcon className=" animate-spin" />
+            ) : (
+              <>
+                <ShoppingBasket />
+                Add to cart
+              </>
+            )}
           </Button>
         </div>
         <h2>

@@ -1,6 +1,11 @@
 "use client";
 
-import { CircleUserRound, LayoutGrid, Search, ShoppingBag } from "lucide-react";
+import {
+  CircleUserRound,
+  LayoutGrid,
+  Search,
+  ShoppingBasket,
+} from "lucide-react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -11,14 +16,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import GlobalApi from "../_utils/GlobalApi";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { UpdateCartContext } from "../_context/UpdateCartContext";
 
 const Header = ({ children }) => {
   const router = useRouter();
+  const user = JSON.parse(sessionStorage.getItem("user"));
   const [categoryList, setCategoryList] = useState([]);
   const isLogin = sessionStorage.getItem("jwt") ? true : false;
+  const jwt = sessionStorage.getItem("jwt");
+  const [totalCartItem, setToatalCartItem] = useState(0);
+  const { updateCart } = useContext(UpdateCartContext);
+
+  useEffect(() => {
+    getCartItems();
+  }, [updateCart]);
+
   useEffect(() => {
     getCategoryList();
   }, []);
@@ -29,6 +44,12 @@ const Header = ({ children }) => {
     });
   };
 
+  const getCartItems = async () => {
+    const cartItemList = await GlobalApi.getCartItem(user.id, jwt);
+    console.log(cartItemList);
+    setToatalCartItem(cartItemList?.length);
+  };
+
   const onSignOut = () => {
     sessionStorage.clear();
     router.push("/create-account");
@@ -37,8 +58,6 @@ const Header = ({ children }) => {
   const params = usePathname();
   const showHeader =
     params === "/sign-in" || params === "/create-account" ? true : false;
-
-  console.log(showHeader);
 
   if (showHeader) return <div></div>;
 
@@ -93,7 +112,10 @@ const Header = ({ children }) => {
       </div>
       <div className=" flex gap-5 items-center">
         <h2 className=" flex gap-2 items-center text-lg">
-          <ShoppingBag /> 0
+          <ShoppingBasket className=" h-7 w-7" />{" "}
+          <span className=" bg-green-600 text-white px-2 rounded-full">
+            {totalCartItem}
+          </span>
         </h2>
         {!isLogin ? (
           children
