@@ -4,14 +4,14 @@ import { TrashIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-const CartItemList = ({ cartItemList }) => {
+const CartItemList = ({ cartItemList, onDeleteItem }) => {
   const [subtotal, setSubtotal] = useState(0);
   useEffect(() => {
     let total = 0;
     cartItemList.forEach((element) => {
       total = total + +element.amount;
     });
-    setSubtotal(total);
+    setSubtotal(total.toFixed(2));
   }, []);
 
   console.log(subtotal);
@@ -34,7 +34,10 @@ const CartItemList = ({ cartItemList }) => {
                 <h2>Quantity - {cart.quantity}</h2>
                 <h2 className=" text-lg font-bold">${cart.amount}</h2>
               </div>
-              <TrashIcon className=" ml-auto mr-3 text-red-500 cursor-pointer" />
+              <TrashIcon
+                onClick={() => onDeleteItem(cart.id)}
+                className=" ml-auto mr-3 text-red-500 cursor-pointer"
+              />
             </div>
           </div>
         ))}

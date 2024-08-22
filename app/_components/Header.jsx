@@ -29,6 +29,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { UpdateCartContext } from "../_context/UpdateCartContext";
 import CartItemList from "./CartItemList";
+import { toast } from "sonner";
 
 const Header = ({ children }) => {
   const router = useRouter();
@@ -55,7 +56,7 @@ const Header = ({ children }) => {
   };
 
   const getCartItems = async () => {
-    const cartItemList_ = await GlobalApi.getCartItem(user.id, jwt);
+    const cartItemList_ = await GlobalApi.getCartItem(user?.id, jwt);
     console.log(cartItemList_);
     setToatalCartItem(cartItemList_?.length);
     setCartItemList(cartItemList_);
@@ -64,6 +65,13 @@ const Header = ({ children }) => {
   const onSignOut = () => {
     sessionStorage.clear();
     router.push("/create-account");
+  };
+
+  const onDeleteItem = (id) => {
+    GlobalApi.deleteCartItem(id, jwt).then((res) => {
+      toast("item removed");
+      getCartItems();
+    });
   };
 
   const params = usePathname();
@@ -134,10 +142,13 @@ const Header = ({ children }) => {
           <SheetContent>
             <SheetHeader>
               <SheetTitle className="flex items-center gap-3 bg-green-600 text-white text-lg font-bold  mt-7 p-3 rounded-lg justify-center">
-                {user.username}'s {"  "} Cart <ShoppingBag />{" "}
+                {user?.username}'s {"  "} Cart <ShoppingBag />{" "}
               </SheetTitle>
               <SheetDescription>
-                <CartItemList cartItemList={cartItemList} />
+                <CartItemList
+                  cartItemList={cartItemList}
+                  onDeleteItem={onDeleteItem}
+                />
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
