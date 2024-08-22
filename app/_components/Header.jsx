@@ -1,6 +1,7 @@
 "use client";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -30,6 +31,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { UpdateCartContext } from "../_context/UpdateCartContext";
 import CartItemList from "./CartItemList";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const Header = ({ children }) => {
   const router = useRouter();
@@ -73,6 +75,15 @@ const Header = ({ children }) => {
       getCartItems();
     });
   };
+
+  const [subtotal, setSubtotal] = useState(0);
+  useEffect(() => {
+    let total = 0;
+    cartItemList.forEach((element) => {
+      total = total + +element.amount;
+    });
+    setSubtotal(total.toFixed(2));
+  }, []);
 
   const params = usePathname();
   const showHeader =
@@ -151,6 +162,19 @@ const Header = ({ children }) => {
                 />
               </SheetDescription>
             </SheetHeader>
+            <SheetClose asChild>
+              <div className=" mt-10">
+                <h2 className=" flex gap-4 items-center">
+                  <span>Subtotal = {subtotal}$</span>
+                  <Button
+                    onClick={() => router.push(jwt ? "/checkout" : "sign-in")}
+                    className=" bg-green-600"
+                  >
+                    Checkout
+                  </Button>
+                </h2>
+              </div>
+            </SheetClose>
           </SheetContent>
         </Sheet>
         {!isLogin ? (
