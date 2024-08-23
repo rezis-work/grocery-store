@@ -35,9 +35,9 @@ import { Button } from "@/components/ui/button";
 
 const Header = ({ children }) => {
   const router = useRouter();
-  const user = JSON.parse(sessionStorage.getItem("user"));
   const [categoryList, setCategoryList] = useState([]);
   const isLogin = sessionStorage.getItem("jwt") ? true : false;
+  const user = JSON.parse(sessionStorage.getItem("user"));
   const jwt = sessionStorage.getItem("jwt");
   const [totalCartItem, setToatalCartItem] = useState(0);
   const { updateCart } = useContext(UpdateCartContext);
@@ -45,7 +45,7 @@ const Header = ({ children }) => {
 
   useEffect(() => {
     getCartItems();
-  }, [updateCart]);
+  }, [updateCart, user]);
 
   useEffect(() => {
     getCategoryList();
@@ -58,10 +58,11 @@ const Header = ({ children }) => {
   };
 
   const getCartItems = async () => {
-    const cartItemList_ = await GlobalApi.getCartItem(user?.id, jwt);
-    console.log(cartItemList_);
-    setToatalCartItem(cartItemList_?.length);
-    setCartItemList(cartItemList_);
+    if (user) {
+      const cartItemList_ = await GlobalApi.getCartItem(user?.id, jwt);
+      setToatalCartItem(cartItemList_?.length);
+      setCartItemList(cartItemList_);
+    }
   };
 
   const onSignOut = () => {
@@ -83,7 +84,7 @@ const Header = ({ children }) => {
       total = total + +element.amount;
     });
     setSubtotal(total.toFixed(2));
-  }, []);
+  }, [cartItemList]);
 
   const params = usePathname();
   const showHeader =
