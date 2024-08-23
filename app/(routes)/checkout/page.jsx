@@ -13,6 +13,12 @@ const Checkout = () => {
   const [cartItemList, setCartItemList] = useState([]);
   const router = useRouter();
 
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [zip, setZip] = useState("");
+  const [address, setAddress] = useState("");
+
   useEffect(() => {
     if (!jwt) {
       router.push("/sign-in");
@@ -56,15 +62,27 @@ const Checkout = () => {
         <div className=" md:col-span-2 mx-20">
           <h2 className=" font-bold text-3xl">Billing Details</h2>
           <div className=" grid grid-cols-2 gap-10 mt-3">
-            <Input placeholder="Name" />
-            <Input placeholder="Email" />
+            <Input
+              placeholder="Name"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <Input
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div className=" grid grid-cols-2 gap-10 mt-3">
-            <Input placeholder="Phone" />
-            <Input placeholder="Zip" />
+            <Input
+              placeholder="Phone"
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <Input placeholder="Zip" onChange={(e) => setZip(e.target.value)} />
           </div>
           <div className=" mt-3">
-            <Input placeholder="Adress" />
+            <Input
+              placeholder="Adress"
+              onChange={(e) => setAddress(e.target.value)}
+            />
           </div>
         </div>
         <div className=" mx-10 border">
