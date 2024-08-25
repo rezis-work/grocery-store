@@ -6,6 +6,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 import { ArrowBigRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -41,11 +42,11 @@ const Checkout = () => {
     cartItemList.forEach((element) => {
       total = total + +element.amount;
     });
-    setSubtotal(total.toFixed(2));
+    setSubtotal(total);
   }, [cartItemList]);
 
   const calculateTotalAmount = () => {
-    const totalAmount = (subtotal * 9) / 100 + 15;
+    const totalAmount = (subtotal * 9) / 100 + 15 + subtotal;
     return totalAmount.toFixed(2);
   };
 
@@ -56,6 +57,24 @@ const Checkout = () => {
 
   const onApprove = (data) => {
     console.log(data);
+    const payload = {
+      data: {
+        paymentId: data.paymentId,
+        totalOrderAmount: calculateTotalAmount(),
+        username: username,
+        email: email,
+        phone: phone,
+        zip: zip,
+        address: address,
+        orderItemList: cartItemList,
+        userId: user.id,
+      },
+    };
+
+    GlobalApi.createOrder(payload, jwt).then((res) => {
+      console.log(res);
+      toast("Order place succesfully");
+    });
   };
 
   return (
@@ -109,6 +128,12 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total: <span>${calculateTotalAmount()}</span>
             </h2>
+            <Button
+              className="cursor-pointer"
+              onClick={() => onApprove({ paymentid: "123" })}
+            >
+              Payment
+            </Button>
             <PayPalButtons
               onApprove={onApprove}
               createOrder={(data, actions) => {
