@@ -71,6 +71,8 @@ const Checkout = () => {
     };
 
     GlobalApi.createOrder(payload, jwt).then((res) => {
+      console.log("Data from PayPal:", data);
+      console.log("Cart Item List before creating order:", cartItemList);
       toast("Order place succesfully");
       cartItemList.forEach((item) => {
         console.log(item);

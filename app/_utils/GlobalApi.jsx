@@ -91,7 +91,7 @@ const createOrder = (data, jwt) =>
 const getMyOrder = (userId, jwt) =>
   axiosClient
     .get(
-      `/orders?filters[userId][$eq]=${userId}&populate[orderItemList][populate][product][populate][images]=url`,
+      `/orders?filters${userId}[$eq]=${userId}&populate[orderItemList][populate][product][populate][images]=url`,
       {
         headers: {
           Authorization: "Bearer " + jwt,
