@@ -72,8 +72,11 @@ const Checkout = () => {
     };
 
     GlobalApi.createOrder(payload, jwt).then((res) => {
-      console.log(res);
       toast("Order place succesfully");
+      cartItemList.forEach((item) => {
+        GlobalApi.deleteCartItem(item.id).then((res) => {});
+      });
+      router.replace("order-confirmation");
     });
   };
 
@@ -128,27 +131,25 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total: <span>${calculateTotalAmount()}</span>
             </h2>
-            <Button
-              className="cursor-pointer"
-              onClick={() => onApprove({ paymentid: "123" })}
-            >
-              Payment
-            </Button>
-            <PayPalButtons
-              onApprove={onApprove}
-              createOrder={(data, actions) => {
-                return actions.order.create({
-                  purchase_units: [
-                    {
-                      amount: {
-                        value: calculateTotalAmount(),
-                        currency_code: "USD",
+
+            {
+              <PayPalButtons
+                disabled={!(username && email && address && zip)}
+                onApprove={onApprove}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: calculateTotalAmount(),
+                          currency_code: "USD",
+                        },
                       },
-                    },
-                  ],
-                });
-              }}
-            />
+                    ],
+                  });
+                }}
+              />
+            }
           </div>
         </div>
       </div>
