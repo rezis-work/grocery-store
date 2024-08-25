@@ -3,7 +3,6 @@ import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PayPalButtons } from "@paypal/react-paypal-js";
-import { ArrowBigRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -74,9 +73,10 @@ const Checkout = () => {
     GlobalApi.createOrder(payload, jwt).then((res) => {
       toast("Order place succesfully");
       cartItemList.forEach((item) => {
-        GlobalApi.deleteCartItem(item.id).then((res) => {});
+        console.log(item);
+        GlobalApi.deleteCartItem(item.id, jwt).then((res) => {});
       });
-      router.replace("order-confirmation");
+      router.replace("order-conformation");
     });
   };
 
@@ -132,24 +132,31 @@ const Checkout = () => {
               Total: <span>${calculateTotalAmount()}</span>
             </h2>
 
-            {
-              <PayPalButtons
-                disabled={!(username && email && address && zip)}
-                onApprove={onApprove}
-                createOrder={(data, actions) => {
-                  return actions.order.create({
-                    purchase_units: [
-                      {
-                        amount: {
-                          value: calculateTotalAmount(),
-                          currency_code: "USD",
-                        },
+            <Button
+              onClick={() =>
+                onApprove({ paymentId: (Math.random() * 7).toString() })
+              }
+              className="bg-green-600"
+            >
+              Pay on Delivery
+            </Button>
+
+            <PayPalButtons
+              disabled={!(username && email && address && zip)}
+              onApprove={onApprove}
+              createOrder={(data, actions) => {
+                return actions.order.create({
+                  purchase_units: [
+                    {
+                      amount: {
+                        value: calculateTotalAmount(),
+                        currency_code: "USD",
                       },
-                    ],
-                  });
-                }}
-              />
-            }
+                    },
+                  ],
+                });
+              }}
+            />
           </div>
         </div>
       </div>
