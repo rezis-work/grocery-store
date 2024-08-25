@@ -2,6 +2,7 @@
 import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PayPalButtons } from "@paypal/react-paypal-js";
 import { ArrowBigRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -51,6 +52,10 @@ const Checkout = () => {
   const calculateTax = () => {
     const tax = (subtotal * 9) / 100;
     return tax.toFixed(2);
+  };
+
+  const onApprove = (data) => {
+    console.log(data);
   };
 
   return (
@@ -104,9 +109,21 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total: <span>${calculateTotalAmount()}</span>
             </h2>
-            <Button>
-              Payment <ArrowBigRight />
-            </Button>
+            <PayPalButtons
+              onApprove={onApprove}
+              createOrder={(data, actions) => {
+                return actions.order.create({
+                  purchase_units: [
+                    {
+                      amount: {
+                        value: calculateTotalAmount(),
+                        currency_code: "USD",
+                      },
+                    },
+                  ],
+                });
+              }}
+            />
           </div>
         </div>
       </div>

@@ -44,8 +44,8 @@ const Header = ({ children }) => {
   const [cartItemList, setCartItemList] = useState([]);
 
   useEffect(() => {
-    getCartItems();
-  }, [updateCart, user]);
+    user && getCartItems();
+  }, [updateCart]);
 
   useEffect(() => {
     getCategoryList();
